@@ -18,9 +18,7 @@ app_v1 = FastAPI(openapi_prefix="/v1")
 
 # authentication is needed
 @app_v1.post("/user", status_code=status.HTTP_201_CREATED)
-async def post_user(
-    user: User, x_custom: str = Header(...), jwt: bool = Depends(check_jwt_token)
-):
+async def post_user(user: User, x_custom: str = Header(...)):
     return {"request body": user, "custom header": x_custom}
 
 

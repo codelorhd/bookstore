@@ -10,3 +10,15 @@ TOKEN_DESCRIPTION = (
 TOKEN_SUMMARY = "It returns JWT token"
 
 ISBN_DESCRIPTION = "It is a unique identifier for a post"
+
+DB_HOST = "104.236.56.177"
+DB_USER = "admin"
+DB_PASSWORD = "ADMIN"
+DB_NAME = "bookstore"
+
+DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+
+UPLOAD_PHOTO_API_KEY = "80e299be072507da25cc01f72061c39d"
+UPLOAD_PHOTO_URL = f"https://api.imgbb.com/1/upload?key={UPLOAD_PHOTO_API_KEY}"
+
+REDIS_URL = "redis://104.236.56.177"

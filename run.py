@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.const import TOKEN_DESCRIPTION, TOKEN_SUMMARY
+from utils.const import REDIS_URL, TOKEN_DESCRIPTION, TOKEN_SUMMARY
 
 from fastapi.exceptions import HTTPException
 from models.jwt_user import JWTUser
@@ -15,6 +15,10 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette import status
 
+from utils.db_object import db
+import utils.redis_object as re
+import aioredis
+
 app = FastAPI(
     title="Bookstore API Documentation",
     description="This is a bookstore api",
@@ -28,6 +32,25 @@ app.include_router(
 )
 app.include_router(app_v2, prefix="/v2", dependencies=[Depends(check_jwt_token)])
 
+# --------------- DATABASE AND REDIS CONNECTION AND DISCONNECTION ---------------
+
+
+@app.on_event("startup")
+async def connect_db():
+    await db.connect()
+    re.redis = await aioredis.create_redis_pool(REDIS_URL)
+
+
+@app.on_event("shutdown")
+async def discconnect_db():
+    await db.disconnect()
+    re.redis.close()
+
+    await re.redis.wait_closed()
+
+
+# --------------- DATABASE AND REDIS  CONNECTION AND DISCONNECTION ---------------
+
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):
@@ -36,19 +59,6 @@ async def middleware(request: Request, call_next):
     The middleware also adds execution time to the header for all endpoints.
     """
     start_time = datetime.utcnow()
-    # modify the request: excempt the token endpoint
-    if not any(
-        word in str(request.url) for word in ["/token", "/docs", "/openapi.json"]
-    ):
-        try:
-            # headers may not include Authorization key
-            jwt_token = request.headers["Authorization"].split("Bearer ")[1]
-            is_valid = check_jwt_token(jwt_token)
-        except Exception as e:
-            is_valid = False
-
-        if not is_valid:
-            return Response("Unauthorized", status.HTTP_401_UNAUTHORIZED)
 
     response = await call_next(request)
     # modify response
@@ -67,7 +77,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     jwt_user_dict = {"username": form_data.username, "password": form_data.password}
 
     jwt_user = JWTUser(**jwt_user_dict)
-    user = authenticate_user(jwt_user)
+    user = await authenticate_user(jwt_user)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

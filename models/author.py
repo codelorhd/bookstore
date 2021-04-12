@@ -5,4 +5,4 @@ from pydantic.networks import EmailStr
 
 class Author(BaseModel):
     name: str
-    book: List[str]
+    books: List[str]

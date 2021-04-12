@@ -1,3 +1,4 @@
+from fastapi.routing import APIRouter
 from models.author import Author
 from fastapi.params import Body
 from models.user import User
@@ -6,7 +7,7 @@ from models.book import Book
 from starlette import status
 from starlette.responses import Response
 
-app_v2 = FastAPI(openapi_prefix="/v2")
+app_v2 = APIRouter()
 
 
 @app_v2.post("/user", status_code=status.HTTP_201_CREATED)

@@ -26,7 +26,7 @@ app_v1 = APIRouter()
 
 
 # authentication is needed
-@app_v1.post("/personel/create", status_code=status.HTTP_201_CREATED, tags=["User"])
+@app_v1.post("/user", status_code=status.HTTP_201_CREATED, tags=["User"])
 async def post_user(user: User):
     await db_insert_personnel(user)
     return {"result": "Personel is created"}

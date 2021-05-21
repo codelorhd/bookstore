@@ -24,16 +24,23 @@ app = FastAPI(
     description="This is a bookstore api",
     version="1.0.0",
 )
+
 # adding dependencies of check_jwt_token will add authorization check in all endpoints
+# You can add multiple dependencies
 app.include_router(
     app_v1,
     prefix="/v1",
-    dependencies=[Depends(check_jwt_token)],
+    dependencies=[Depends(check_jwt_token), Depends(re.check_test_redis)],
 )
-app.include_router(app_v2, prefix="/v2", dependencies=[Depends(check_jwt_token)])
+app.include_router(
+    app_v2,
+    prefix="/v2",
+    dependencies=[Depends(check_jwt_token), Depends(re.check_test_redis)],
+)
 
 # --------------- DATABASE AND REDIS CONNECTION AND DISCONNECTION ---------------
 
+# Note these events will not be in called when testing.
 
 @app.on_event("startup")
 async def connect_db():

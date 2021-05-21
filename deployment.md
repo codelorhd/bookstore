@@ -17,3 +17,15 @@
 - Redis on Serve
     - `docker run --name my-redis -d -p 6379:6379 redis`
     - It can be persisted too
+
+
+## For Testing
+
+- Create a test database
+`docker run --name=test-db -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=test -p 5433:5432 -d postgres:10`
+
+-- you need to copy the same scripts for creation of tables into these as well
+
+- Create a test redis
+    - `docker run --name test-redis -d -p 6378:6379 redis`
+

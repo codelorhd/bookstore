@@ -32,7 +32,7 @@ REDIS_URL_PRODUCTION = "redis://10.108.0.2"
 
 TESTING = False
 IS_LOAD_TEST = False
-IS_PRODUCTION = True if os.getenv("PRODUCTION") == "true" else False
+IS_PRODUCTION = True if os.environ["PRODUCTION"] == "true" else False
 
 TEST_DB_HOST = "localhost:5433"
 TEST_DB_USER = "test"

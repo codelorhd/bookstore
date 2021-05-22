@@ -1,7 +1,7 @@
 - Create two droplets/server one for database one for api server
 
 
-# database docker
+# setting up database and redis docker
 
 - Creating a docker image for the database
     `docker run --name=bookstore-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=ADMIN -e POSTGRES_DB=bookstore -p 5432:5432 -d postgres:10`
@@ -19,7 +19,7 @@
     - It can be persisted too
 
 
-## For Testing
+## Unit Testing
 
 - Create a test database
 `docker run --name=test-db -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=test -p 5433:5432 -d postgres:10`
@@ -29,3 +29,16 @@
 - Create a test redis
     - `docker run --name test-redis -d -p 6378:6379 redis`
 
+## Load Testing
+    # Important Parameter is the RPS: Request Per Seconds
+- load testing
+    - locust -f tests/locust_load_test.py
+
+- apache bench test
+    - ab -n 100 -c 5 -H "Authorization: Bearer <TOKEN>" -p tests/ab_json/post_user.json http://localhost:3000/v1/user
+    
+     - ab -n 100 -c 5 -H -p tests/ab_json/token.json http://localhost:3000/v1/token
+
+     - ab -n 100 -c 5 -H -g http://localhost:3000/v1/get/something/2
+
+    

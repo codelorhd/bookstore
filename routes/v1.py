@@ -18,9 +18,11 @@ from utils.db_functions import (
     db_get_author_from_id,
     db_get_book_with_isbn,
     db_insert_personnel,
+    db_insert_user,
     db_patch_author_name,
 )
 from utils.helper_functions import upload_image_to_img_server
+from utils.security import get_hashed_password
 
 app_v1 = APIRouter()
 
@@ -28,7 +30,11 @@ app_v1 = APIRouter()
 # authentication is needed
 @app_v1.post("/user", status_code=status.HTTP_201_CREATED, tags=["User"])
 async def post_user(user: User):
-    await db_insert_personnel(user)
+
+    hashed_password = get_hashed_password(user.password)
+    # user.password = ''
+    user.password = hashed_password
+    await db_insert_user(user)
     return {"result": "Personel is created"}
 
     # return {"request body": user, "custom header": x_custom}

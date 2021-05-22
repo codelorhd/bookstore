@@ -1,3 +1,4 @@
+# from tests.tests import get_hashed_password
 from fastapi.param_functions import Query
 from sqlalchemy.sql.expression import false
 from models.user import User
@@ -17,12 +18,18 @@ async def db_check_jwt_username(username):
         return True
 
 
-async def db_insert_personnel(user: User):
+async def db_insert_user(user: User):
     query = """ INSERT INTO users (username, password, mail, role) 
                 VALUES (:name, :password, :mail, :role ) """
     values = dict(user)
     print(values)
+    await execute(query=query, is_many=False, values=values)
 
+async def db_insert_personnel(user: User):
+    query = """ INSERT INTO personnel (username, password, mail, role) 
+                VALUES (:name, :password, :mail, :role ) """
+    values = dict(user)
+    print(values)
     await execute(query=query, is_many=False, values=values)
 
 

@@ -1,23 +1,23 @@
+import pickle
 from datetime import datetime
-from utils.const import REDIS_URL, TOKEN_DESCRIPTION, TOKEN_SUMMARY
 
+import aioredis
+from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
-from models.jwt_user import JWTUser
 from fastapi.param_functions import Depends
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from starlette.status import HTTP_401_UNAUTHORIZED
-from utils.security import authenticate_user, check_jwt_token, create_jwt_token
-from fastapi import FastAPI
-from routes.v1 import app_v1
-from routes.v2 import app_v2
-
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette import status
+from starlette.status import HTTP_401_UNAUTHORIZED
 
-from utils.db_object import db
 import utils.redis_object as re
-import aioredis
+from models.jwt_user import JWTUser
+from routes.v1 import app_v1
+from routes.v2 import app_v2
+from utils.const import REDIS_URL, TESTING, TOKEN_DESCRIPTION, TOKEN_SUMMARY
+from utils.db_object import db
+from utils.security import authenticate_user, check_jwt_token, create_jwt_token
 
 app = FastAPI(
     title="Bookstore API Documentation",
@@ -42,18 +42,21 @@ app.include_router(
 
 # Note these events will not be in called when testing.
 
+
 @app.on_event("startup")
 async def connect_db():
-    await db.connect()
-    re.redis = await aioredis.create_redis_pool(REDIS_URL)
+    if not TESTING:
+        await db.connect()
+        re.redis = await aioredis.create_redis_pool(REDIS_URL)
 
 
 @app.on_event("shutdown")
 async def discconnect_db():
-    await db.disconnect()
-    re.redis.close()
+    if not TESTING:
+        await db.disconnect()
+        re.redis.close()
 
-    await re.redis.wait_closed()
+        await re.redis.wait_closed()
 
 
 # --------------- DATABASE AND REDIS  CONNECTION AND DISCONNECTION ---------------
@@ -81,13 +84,24 @@ async def middleware(request: Request, call_next):
     summary=TOKEN_SUMMARY,
 )
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    jwt_user_dict = {"username": form_data.username, "password": form_data.password}
+    redis_key = f"token: {form_data.username},{form_data.password}"
+    user = await re.redis.get(redis_key)
 
-    jwt_user = JWTUser(**jwt_user_dict)
-    user = await authenticate_user(jwt_user)
+    if not user:
+        jwt_user_dict = {"username": form_data.username, "password": form_data.password}
 
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        jwt_user = JWTUser(**jwt_user_dict)
+        user = await authenticate_user(jwt_user)
+
+        # save it inside redis
+        await re.redis.set(redis_key, pickle.dumps(user))
+
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    else:
+        await re.redis.delete(redis_key)
+        user = pickle.loads(user)
 
     # create jwt for the user
     jwt_token = create_jwt_token(user=user)

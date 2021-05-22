@@ -43,6 +43,10 @@
 
     
 ## Deploying
+
+    ### for semi-automate deploy
+        # remove the old files
+
   - ### docker build -t bookstore-api-build .
    
 

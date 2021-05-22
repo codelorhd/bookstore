@@ -18,7 +18,7 @@ async def db_check_jwt_username(username):
 
 
 async def db_insert_personnel(user: User):
-    query = """ INSERT INTO personel (username, password, mail, role) 
+    query = """ INSERT INTO users (username, password, mail, role) 
                 VALUES (:name, :password, :mail, :role ) """
     values = dict(user)
     print(values)

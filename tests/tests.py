@@ -14,7 +14,7 @@ sys.path.append(
 )
 
 from passlib.context import CryptContext
-from utils.db import execute
+from utils.db import execute, fetch
 
 from run import app
 
@@ -49,10 +49,10 @@ def check_user(username, mail):
 
     # run async functions in a non-async function
     result = loop.run_until_complete(
-        execute(
+        fetch(
             query,
-            is_many=True,
-            values=values,
+            True,
+            values,
         )
     )
 
@@ -112,12 +112,12 @@ def test_post_user():
         "name": "user2",
         "password": "secret",
         "mail": "a@b.com",
-        "role": "admin",
+        "role": "ADMIN",
     }
 
-    response = client.post("/v1/user", user_dict, headers=auth_header)
+    response = client.post("/v1/user", json=user_dict, headers=auth_header)
 
-    print(response.json())
+    # print(response.json())
     assert response.status_code == 201
     assert check_user(username="user2", mail="a@b.com")
     clear_db()

@@ -42,3 +42,12 @@
      - ab -n 100 -c 5 -H -g http://localhost:3000/v1/get/something/2
 
     
+## Deploying
+ - docker build -t bookstore-api-build .
+ - change the Environment variables are correct wtih the ones expected by the base image
+ - https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
+
+ ### docker run --name=bookstore-api -e MODULE_NAME="run" -e PORT='3000' -p 3000:3000 bookstore-api-build
+
+ ### When developing on to digital ocean and your database is separate from the codes, you need to create a private network
+ 

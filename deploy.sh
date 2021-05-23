@@ -3,7 +3,6 @@
 # REMEMBER TO RUN THIS TO ACTIVATE THE BASH FILES
 # chmod +x deploy.sh
 
-
 # remove the old files
 ssh root@104.236.57.23 'rm -r ~/bookstore'
 
@@ -24,4 +23,6 @@ ssh root@104.236.57.23 'docker rm bookstore-api'
 
 # build the and run the new code
 ssh root@104.236.57.23 'docker build -t bookstore-api-build ~/bookstore'
+# you could use docker-compose here so you can keep 
+# PRODUCTION environment variables out of the repository
 ssh root@104.236.57.23 'docker run -idt --name=bookstore-api -e MODULE_NAME="run" -e PORT="3000" -e PRODUCTION="true" -p 3000:3000 bookstore-api-build'

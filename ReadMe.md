@@ -35,7 +35,10 @@
     - locust -f tests/locust_load_test.py
 
 - apache bench test
+    comes by default or you install apache-utils 
     - ab -n 100 -c 5 -H "Authorization: Bearer <TOKEN>" -p tests/ab_json/post_user.json http://localhost:3000/v1/user
+
+    - ab -n 100 -c 5 -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJTb2xvbW9uIiwiZXhwaXJhdGlvbiI6MTYyMjIzODY5NC4wNDk1OTEsInJvbGUiOiJBRE1JTiJ9.zz_RU2PJWWrxQcHz6YF1TfVoZrxTqUXWiv1f0hxfX88" -p tests/ab_json/post_user.json http://143.244.222.147/v1/user
     
      - ab -n 100 -c 5 -H -p tests/ab_json/token.json http://localhost:3000/v1/token
 

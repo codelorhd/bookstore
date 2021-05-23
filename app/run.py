@@ -86,6 +86,9 @@ async def middleware(request: Request, call_next):
     response.headers["X-Execution-Time"] = str(execution_time)
     return response
 
+@app.get('/')
+async def health_check():
+    return {"OK"}
 
 # exempt this endpoint from authorization check
 @app.post(

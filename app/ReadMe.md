@@ -1,5 +1,7 @@
 - Create two droplets/server one for database one for api server
 
+## If you have deployed on the server with the nginx-https, requests should only be through https else you get Not Found
+## Do not destroy the api-serer and rebuilt many time cause lets encrypt has rate limit
 
 # setting up database and redis docker
 
@@ -43,6 +45,7 @@
 
     
 ## Deploying
+    - Now in deploy.sh
   - ### docker build -t bookstore-api-build .
    
 

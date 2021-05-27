@@ -1,10 +1,17 @@
+limit_req_zone $binary_remote_addr zone=bookstore_rate_limit:10m rate=10r/m; # 10m -> 10mb, 2/r/s/d 2 request per s-seconds/m-minutes/d-days
+
 server {
     listen 80;
 
     server_name bookstoreapi.solomonaboyeji.com;
 
-    location / {
-        proxy_pass http://104.236.57.23:3000/; # the ip o the server or the docker name inside this machine
+    location /v1/user {
+        # rate limit
+        limit_req zone=bookstore_rate_limit;
+        proxy_pass http://bookstore-loadbalancer;  # do not add slash at the back
+    }
 
+    location / {
+        proxy_pass http://bookstore-loadbalancer/; 
     }
 }

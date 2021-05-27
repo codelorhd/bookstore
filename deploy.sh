@@ -18,7 +18,12 @@ scp -r Dockerfile  root@104.236.57.23:~/bookstore
 scp -r requirements.txt  root@104.236.57.23:~/bookstore
 scp -r ReadMe.md  root@104.236.57.23:~/bookstore
 scp -r .gitignore  root@104.236.57.23:~/bookstore
-scp -r nginx-reverse-proxy  root@104.236.57.23:~/bookstore
+
+# http only
+# scp -r nginx-reverse-proxy  root@104.236.57.23:~/bookstore
+
+# https
+scp -r nginx-https  root@104.236.57.23:~/bookstore
 
 # stop the docker running on the cloud
 ssh root@104.236.57.23 'docker stop bookstore-api'
@@ -33,5 +38,7 @@ ssh root@104.236.57.23 'docker run -idt --name=bookstore-api -e MODULE_NAME="run
 # build and create the nginx
 ssh root@104.236.57.23 'docker stop api-nginx'
 ssh root@104.236.57.23 'docker rm api-nginx'
-ssh root@104.236.57.23 'docker build -t bookstore-nginx ~/bookstore/nginx-reverse-proxy'
-ssh root@104.236.57.23 'docker run -idt --name=api-nginx -p 80:80 bookstore-nginx'
+
+# now start the nginx server for both http and https requests
+ssh root@104.236.57.23 'docker build -t bookstore-nginx ~/bookstore/nginx-https'
+ssh root@104.236.57.23 'docker run -idt --name=api-nginx -p 80:80 -p 443:443 -e DOMAIN=bookstoreapi.solomonaboyeji.com -e EMAIL=solomonaboyeji@gmail.com bookstore-nginx'
